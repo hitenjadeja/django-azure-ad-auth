@@ -37,7 +37,7 @@ class AzureActiveDirectoryBackend(object):
             state=state
         )
 
-    def logout_url(redirect_uri):
+    def logout_url(self, redirect_uri):
         return get_logout_url(redirect_uri=redirect_uri)
 
     def authenticate(self, request=None, token=None, nonce=None, **kwargs):
