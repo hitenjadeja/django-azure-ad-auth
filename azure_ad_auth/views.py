@@ -47,7 +47,7 @@ def complete(request):
     state = getattr(request, method).get('state')
     logger.debug(f'original_state: {original_state}')
     logger.debug(f'state: {state}')
-    if original_state == state:
+    if not original_state or original_state == state:
         token = getattr(request, method).get('id_token')
         nonce = request.session.get('nonce')
         user = backend.authenticate(request=request, token=token, nonce=nonce)
