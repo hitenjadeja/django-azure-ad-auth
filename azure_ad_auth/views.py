@@ -41,7 +41,7 @@ def auth(request):
 @never_cache
 def logout(request):
     backend = AzureActiveDirectoryBackend()
-    redirect_uri = request.build_absolute_uri(reverse(complete))
+    redirect_uri = request.build_absolute_uri(reverse(auth))
     logout_url = backend.logout_url(
         redirect_uri=redirect_uri
     )
