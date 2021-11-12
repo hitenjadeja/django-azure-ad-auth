@@ -42,14 +42,8 @@ def auth(request):
 def logout(request):
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(complete))
-    nonce = str(uuid.uuid4())
-    request.session['nonce'] = nonce
-    state = str(uuid.uuid4())
-    request.session['state'] = state
-    logout_url = backend.get_logout_url(
-        redirect_uri=redirect_uri,
-        nonce=nonce,
-        state=state
+    logout_url = backend.logout_url(
+        redirect_uri=redirect_uri
     )
     return HttpResponseRedirect(logout_url)
 
