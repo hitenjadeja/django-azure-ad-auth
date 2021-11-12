@@ -51,7 +51,7 @@ def complete(request):
         token = getattr(request, method).get('id_token')
         nonce = request.session.get('nonce')
         user = backend.authenticate(request=request, token=token, nonce=nonce)
-        logger.debug(f'User: {user}')
+        logger.debug(f'User: {user.email}')
         if user is not None:
             login(request, user)
             return HttpResponseRedirect(get_login_success_url(request))
