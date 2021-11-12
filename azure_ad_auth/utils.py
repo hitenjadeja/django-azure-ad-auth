@@ -1,3 +1,4 @@
+import logging
 from base64 import b64decode
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_der_x509_certificate
@@ -11,6 +12,8 @@ try:
 except ImportError:
     # Python 2
     from urllib import urlencode
+
+logger = logging.getLogger(__name__)
 
 
 AUTHORITY = getattr(settings, 'AAD_AUTHORITY', 'https://login.microsoftonline.com')
@@ -69,6 +72,7 @@ def parse_x509_DER_list(federation_metadata_document):
 
 
 def get_public_keys():
+    logger.debug('get_public_keys')
     try:
         federation_metadata_document_url = get_federation_metadata_document_url()
         response = requests.get(federation_metadata_document_url)
@@ -79,6 +83,7 @@ def get_public_keys():
         keys = [load_der_x509_certificate(x509_DER, default_backend()).public_key() for x509_DER in x509_DER_list]
     except:
         keys = []
+    logger.debug(f"Keys: {keys}")
     return keys
 
 
@@ -86,12 +91,13 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
     for key in get_public_keys():
         try:
             payload = jwt.decode(token, key=key, audience=audience)
-
+            logger.debug(f'payload:, {payload}')
             if payload['nonce'] != nonce:
                 continue
 
             return payload
         except (jwt.InvalidTokenError, IndexError) as e:
+            logger.error(f'InvalidTokenError or IndexError {e}')
             pass
 
     return None
