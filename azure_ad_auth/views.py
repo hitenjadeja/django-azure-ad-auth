@@ -1,3 +1,4 @@
+import logging
 from .backends import AzureActiveDirectoryBackend
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login
@@ -19,6 +20,7 @@ except ImportError:
     # Python 2
     from urlparse import urlparse
 
+logger = logging.getlogger(__name__)
 
 @never_cache
 def auth(request):
@@ -43,6 +45,8 @@ def complete(request):
     method = 'GET' if backend.RESPONSE_MODE == 'fragment' else 'POST'
     original_state = request.session.get('state')
     state = getattr(request, method).get('state')
+    logger.debug(f'original_state: {original_state}')
+    logger.debug(f'state: {state}')
     if original_state == state:
         token = getattr(request, method).get('id_token')
         nonce = request.session.get('nonce')
@@ -50,6 +54,7 @@ def complete(request):
         if user is not None:
             login(request, user)
             return HttpResponseRedirect(get_login_success_url(request))
+    logger.debug('State did not match')
     return HttpResponseRedirect('failure')
 
 
