@@ -88,7 +88,9 @@ def get_public_keys():
 
 
 def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
+    logger.debug(f'get_token_payload: token={token}, audience={audience}, nonce={nonce}')
     headers = jwt.get_unverified_header(token)
+    logger.debug(f'headers={headers}')
     algorithm = headers.get('alg', 'RS256')
     for key in get_public_keys():
         try:
