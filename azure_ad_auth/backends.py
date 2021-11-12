@@ -1,3 +1,4 @@
+import logging
 from .utils import get_token_payload, get_token_payload_email, get_login_url, get_logout_url, RESPONSE_MODE
 from base64 import urlsafe_b64encode
 from django.conf import settings
@@ -11,6 +12,8 @@ except ImportError:
     def get_user_model(*args, **kwargs):
         return User
 from hashlib import sha1
+
+logger = logging.getLogger(__name__)
 
 
 class AzureActiveDirectoryBackend(object):
@@ -38,11 +41,13 @@ class AzureActiveDirectoryBackend(object):
         return get_logout_url(redirect_uri=redirect_uri)
 
     def authenticate(self, request=None, token=None, nonce=None, **kwargs):
+        logger.debug(f"Authenticate... Token: {token}, Nonce: {nonce}")
         if token is None:
             return None
 
         payload = get_token_payload(token=token, nonce=nonce)
         email = get_token_payload_email(payload)
+        logger.debug(f"Email: {email}")
 
         if email is None:
             return None
@@ -73,6 +78,7 @@ class AzureActiveDirectoryBackend(object):
             user = self.User.objects.get(pk=user_id)
             return user
         except self.User.DoesNotExist:
+            logger.debug(f"User Does Not Exist")
             return None
 
     def add_user_to_group(self, user, payload):
@@ -88,17 +94,20 @@ class AzureActiveDirectoryBackend(object):
                     pass
 
     def create_user(self, user_kwargs, payload):
+        logger.debug(f"Create User: {user_kwargs}")
         username_field = getattr(self.User, 'USERNAME_FIELD', 'username')
         email = user_kwargs.get('email', None)
 
         if username_field and username_field != 'email' and email:
             user_kwargs[username_field] = self.username_generator(email)
 
+        logger.debug(f"User Mapping: {self.USER_MAPPING}")
         for user_field, token_field in self.USER_MAPPING.items():
             if token_field not in payload:
                 continue
             user_kwargs[user_field] = payload[token_field]
 
+        logger.debug(f"User Static Mapping: {self.USER_STATIC_MAPPING}")
         for user_field, val in self.USER_STATIC_MAPPING.items():
             user_kwargs[user_field] = val
 
