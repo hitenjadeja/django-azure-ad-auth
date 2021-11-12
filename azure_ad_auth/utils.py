@@ -96,7 +96,7 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
         try:
             payload = jwt.decode(token, key=key, audience=audience, algorithms=[algorithm])
             logger.debug(f'payload:, {payload}')
-            if payload['nonce'] != nonce:
+            if nonce and payload['nonce'] != nonce:
                 continue
 
             return payload
