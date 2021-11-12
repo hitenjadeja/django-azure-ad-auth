@@ -20,7 +20,7 @@ except ImportError:
     # Python 2
     from urlparse import urlparse
 
-logger = logging.getlogger(__name__)
+logger = logging.getLogger(__name__)
 
 @never_cache
 def auth(request):
