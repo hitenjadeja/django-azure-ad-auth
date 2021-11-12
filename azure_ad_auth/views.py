@@ -39,6 +39,22 @@ def auth(request):
 
 
 @never_cache
+def logout(request):
+    backend = AzureActiveDirectoryBackend()
+    redirect_uri = request.build_absolute_uri(reverse(complete))
+    nonce = str(uuid.uuid4())
+    request.session['nonce'] = nonce
+    state = str(uuid.uuid4())
+    request.session['state'] = state
+    logout_url = backend.get_logout_url(
+        redirect_uri=redirect_uri,
+        nonce=nonce,
+        state=state
+    )
+    return HttpResponseRedirect(logout_url)
+
+
+@never_cache
 @csrf_exempt
 def complete(request):
     backend = AzureActiveDirectoryBackend()
