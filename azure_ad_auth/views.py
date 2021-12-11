@@ -1,7 +1,7 @@
 import logging
 from .backends import AzureActiveDirectoryBackend
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, login
+from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout
 from django import VERSION
 from django.http import HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
@@ -40,10 +40,8 @@ def auth(request):
 
 @never_cache
 def logout(request):
-    if "nonce" in request.session.keys():
-        del request.session["nonce"]
-    if "state" in request.session.keys():
-        del request.session["state"]
+    logout(request)
+    
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(auth))
     logger.debug(redirect_uri)
