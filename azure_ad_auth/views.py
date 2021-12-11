@@ -40,6 +40,10 @@ def auth(request):
 
 @never_cache
 def logout(request):
+    if "nonce" in self.request.session.keys():
+        del self.request.session["nonce"]
+    if "state" in self.request.session.keys():
+        del self.request.session["state"]
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(auth))
     logger.debug(redirect_uri)
