@@ -56,18 +56,21 @@ class AzureActiveDirectoryBackend(object):
 
         new_user = {'email': email}
 
-        users = self.User.objects.filter(email=email)
+        users = self.User.objects.filter(email__iexact=email)
         if len(users) == 0 and self.USER_CREATION:
+            logger.debug("User does not exist, so create")
             user = self.create_user(new_user, payload)
 
             # Try mapping group claims to matching groups
             self.add_user_to_group(user, payload)
         elif len(users) == 1:
+            logger.debug("User found")
             user = users[0]
 
             # Try mapping group claims to matching groups
             self.add_user_to_group(user, payload)
         else:
+            logger.debug(f"{len(users)} found, something is wrong")
             return None
 
         user.backend = '{}.{}'.format(self.__class__.__module__, self.__class__.__name__)
