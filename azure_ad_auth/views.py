@@ -66,8 +66,10 @@ def complete(request):
             login(request, user)
             return HttpResponseRedirect(get_login_success_url(request))
         else:
-            logger.debug(f'User: {user.email}')
-    logger.debug('State did not match')
+            logger.debug(f'Could not authenticate user')
+    else:
+        logger.debug('State did not match')
+        
     return HttpResponseRedirect('failure')
 
 
