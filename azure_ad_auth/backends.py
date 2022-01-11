@@ -70,8 +70,8 @@ class AzureActiveDirectoryBackend(object):
             # Try mapping group claims to matching groups
             self.add_user_to_group(user, payload)
         else:
-            logger.debug(f"{len(users)} found, something is wrong")
-            return None
+            logger.error(f"{len(users)} found, something is wrong")
+            return
 
         user.backend = '{}.{}'.format(self.__class__.__module__, self.__class__.__name__)
         return user
