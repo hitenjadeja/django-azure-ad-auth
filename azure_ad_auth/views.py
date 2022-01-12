@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 @never_cache
 def auth(request):
     logger.debug("Auth View")
+    if request.user:
+        logger.debug(request.user, request.user.is_authenticated)
+    else:
+        logger.debug("No user attached to the request")
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(complete))
     nonce = str(uuid.uuid4())
