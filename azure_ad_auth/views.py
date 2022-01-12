@@ -26,7 +26,8 @@ logger = logging.getLogger(__name__)
 def auth(request):
     logger.debug("Auth View")
     if hasattr(request, "user"):
-        logger.debug(request.user, request.user.is_authenticated)
+        logger.debug("User: ", request.user)
+        logger.debug("Authenicated?: ", request.user.is_authenticated)
     else:
         logger.debug("No user attached to the request")
     backend = AzureActiveDirectoryBackend()
