@@ -28,6 +28,10 @@ def auth(request):
     logger.debug("Request before: ", str(request))
     if hasattr(request, "user"):
         logger.debug("user exists")
+        if request.user.is_authenticated:
+            logger.debug("User is authenticated")
+        else:
+            logger.debug("Nope")
         logger.debug("Request 1: ", request)
         logger.debug("User: ", request.user)
         logger.debug("Authenicated?: ", request.user.is_authenticated)
