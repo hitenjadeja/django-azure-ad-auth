@@ -24,10 +24,7 @@ logger = logging.getLogger(__name__)
 
 @never_cache
 def auth(request):
-    logger.debug("Auth View")
-    cookies = request.COOKIES.items()
-    logger.debug("Cookies: ", cookies)
-    logger.error("can we get the request")
+    import pdb;pdb.set_trace()
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(complete))
     nonce = str(uuid.uuid4())
