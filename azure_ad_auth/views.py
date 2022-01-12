@@ -25,10 +25,13 @@ logger = logging.getLogger(__name__)
 @never_cache
 def auth(request):
     logger.debug("Auth View")
+    logger.debug("Request before: ", request)
     if hasattr(request, "user"):
+        logger.debug("Request 1: ", request)
         logger.debug("User: ", request.user)
         logger.debug("Authenicated?: ", request.user.is_authenticated)
     else:
+        logger.debug("Request 2: ", request)
         logger.debug("No user attached to the request")
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(complete))
@@ -41,6 +44,7 @@ def auth(request):
         nonce=nonce,
         state=state
     )
+    logger.debug("Request after: ", request)
     logger.debug("End of Auth View")
     return HttpResponseRedirect(login_url)
 
