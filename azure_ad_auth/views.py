@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 @never_cache
 def auth(request):
-    logger.debug("Auth View:", request.user)
-    if request.user:
+    logger.debug("Auth View")
+    if hasattr(request, "user"):
         logger.debug(request.user, request.user.is_authenticated)
     else:
         logger.debug("No user attached to the request")
