@@ -40,6 +40,7 @@ def auth(request):
         nonce=nonce,
         state=state
     )
+    logger.debug("End of Auth View")
     return HttpResponseRedirect(login_url)
 
 
