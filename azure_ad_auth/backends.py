@@ -43,6 +43,8 @@ class AzureActiveDirectoryBackend(object):
     def authenticate(self, request=None, token=None, nonce=None, **kwargs):
         if request.user:
             logger.debug(request.user, request.user.is_authenticated)
+        else:
+            logger.debug("No user attached to request")
             
         logger.debug(f"Authenticate... Token: {token}, Nonce: {nonce}")
         if token is None:
