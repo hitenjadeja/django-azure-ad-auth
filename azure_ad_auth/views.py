@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 @never_cache
 def auth(request):
+    logger.debug("Auth View")
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(complete))
     nonce = str(uuid.uuid4())
