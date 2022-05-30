@@ -41,18 +41,11 @@ class AzureActiveDirectoryBackend(object):
         return get_logout_url(redirect_uri=redirect_uri)
 
     def authenticate(self, request=None, token=None, nonce=None, **kwargs):
-        if request.user:
-            logger.debug(request.user, request.user.is_authenticated)
-        else:
-            logger.debug("No user attached to request")
-            
-        logger.debug(f"Authenticate... Token: {token}, Nonce: {nonce}")
         if token is None:
             return None
 
         payload = get_token_payload(token=token, nonce=nonce)
         email = get_token_payload_email(payload)
-        logger.debug(f"Email: {email}")
 
         if email is None:
             return None
@@ -63,13 +56,11 @@ class AzureActiveDirectoryBackend(object):
 
         users = self.User.objects.filter(email__iexact=email)
         if len(users) == 0 and self.USER_CREATION:
-            logger.debug("User does not exist, so create")
             user = self.create_user(new_user, payload)
 
             # Try mapping group claims to matching groups
             self.add_user_to_group(user, payload)
         elif len(users) == 1:
-            logger.debug("User found")
             user = users[0]
 
             # Try mapping group claims to matching groups
@@ -86,7 +77,6 @@ class AzureActiveDirectoryBackend(object):
             user = self.User.objects.get(pk=user_id)
             return user
         except self.User.DoesNotExist:
-            logger.debug(f"User Does Not Exist")
             return None
 
     def add_user_to_group(self, user, payload):
@@ -102,20 +92,17 @@ class AzureActiveDirectoryBackend(object):
                     pass
 
     def create_user(self, user_kwargs, payload):
-        logger.debug(f"Create User: {user_kwargs}")
         username_field = getattr(self.User, 'USERNAME_FIELD', 'username')
         email = user_kwargs.get('email', None)
 
         if username_field and username_field != 'email' and email:
             user_kwargs[username_field] = self.username_generator(email)
 
-        logger.debug(f"User Mapping: {self.USER_MAPPING}")
         for user_field, token_field in self.USER_MAPPING.items():
             if token_field not in payload:
                 continue
             user_kwargs[user_field] = payload[token_field]
 
-        logger.debug(f"User Static Mapping: {self.USER_STATIC_MAPPING}")
         for user_field, val in self.USER_STATIC_MAPPING.items():
             user_kwargs[user_field] = val
 
