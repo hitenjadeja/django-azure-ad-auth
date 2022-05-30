@@ -72,7 +72,6 @@ def parse_x509_DER_list(federation_metadata_document):
 
 
 def get_public_keys():
-    logger.debug('get_public_keys')
     try:
         federation_metadata_document_url = get_federation_metadata_document_url()
         response = requests.get(federation_metadata_document_url)
@@ -83,19 +82,15 @@ def get_public_keys():
         keys = [load_der_x509_certificate(x509_DER, default_backend()).public_key() for x509_DER in x509_DER_list]
     except:
         keys = []
-    logger.debug(f"Keys: {keys}")
     return keys
 
 
 def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
-    logger.debug(f'get_token_payload: token={token}, audience={audience}, nonce={nonce}')
     headers = jwt.get_unverified_header(token)
-    logger.debug(f'headers={headers}')
     algorithm = headers.get('alg', 'RS256')
     for key in get_public_keys():
         try:
             payload = jwt.decode(token, key=key, audience=audience, algorithms=[algorithm])
-            logger.debug(f'payload:, {payload}')
             if nonce and payload['nonce'] != nonce:
                 continue
 
