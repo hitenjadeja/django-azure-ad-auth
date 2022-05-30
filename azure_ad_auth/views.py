@@ -44,7 +44,6 @@ def logout(request):
     
     backend = AzureActiveDirectoryBackend()
     redirect_uri = request.build_absolute_uri(reverse(auth))
-    logger.debug(redirect_uri)
     logout_url = backend.logout_url(redirect_uri)
     return HttpResponseRedirect(logout_url)
 
@@ -56,8 +55,6 @@ def complete(request):
     method = 'GET' if backend.RESPONSE_MODE == 'fragment' else 'POST'
     original_state = request.session.get('state')
     state = getattr(request, method).get('state')
-    logger.debug(f'original_state: {original_state}')
-    logger.debug(f'state: {state}')
     if not original_state or original_state == state:
         token = getattr(request, method).get('id_token')
         nonce = request.session.get('nonce')
@@ -66,9 +63,9 @@ def complete(request):
             login(request, user)
             return HttpResponseRedirect(get_login_success_url(request))
         else:
-            logger.debug(f'Could not authenticate user')
+            logger.error(f'Could not authenticate user')
     else:
-        logger.debug('State did not match')
+        logger.error('State did not match')
         
     return HttpResponseRedirect('failure')
 
