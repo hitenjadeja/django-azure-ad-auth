@@ -92,7 +92,7 @@ class AzureActiveDirectoryBackend(object):
                     pass
 
     def create_user(self, user_kwargs, payload):
-        username_field = getattr(self.User, 'USERNAME_FIELD', 'username')
+        username_field = getattr(self.User, 'USERNAME_FIELD', 'username').replace("'", "")
         email = user_kwargs.get('email', None)
 
         if username_field and username_field != 'email' and email:
@@ -110,4 +110,4 @@ class AzureActiveDirectoryBackend(object):
 
     @staticmethod
     def username_generator(email):
-        return urlsafe_b64encode(sha1(email.encode('utf-8')).digest()).rstrip(b'=')
+        return urlsafe_b64encode(sha1(email.encode('utf-8')).digest()).rstrip(b'=').replace("'", "")
