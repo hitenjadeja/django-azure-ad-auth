@@ -1,5 +1,5 @@
 import logging
-from .utils import get_token_payload, get_token_payload_email, get_login_url, get_logout_url, RESPONSE_MODE
+from .utils import get_token_payload, get_token_payload_email, get_login_url, get_logout_url, RESPONSE_MODE, get_token_payload_field
 from base64 import urlsafe_b64encode
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -21,6 +21,7 @@ class AzureActiveDirectoryBackend(object):
     USER_MAPPING = getattr(settings, 'AAD_USER_MAPPING', {})
     USER_STATIC_MAPPING = getattr(settings, 'AAD_USER_STATIC_MAPPING', {})
     GROUP_MAPPING = getattr(settings, 'AAD_GROUP_MAPPING', {})
+    CUSTOMER_TENANT_ID = getattr(settings, 'CUSTOMER_TENANT_ID', False)
     RESPONSE_MODE = RESPONSE_MODE
 
     supports_anonymous_user = False
@@ -45,6 +46,10 @@ class AzureActiveDirectoryBackend(object):
             return None
 
         payload = get_token_payload(token=token, nonce=nonce)
+        tid = get_token_payload_field(payload, "tid")
+        if tid != CUSTOMER_TENANT_ID:
+            logger.error(f"Another tenant id:{tid} tried to login")
+            return
         email = get_token_payload_email(payload)
 
         if email is None:
