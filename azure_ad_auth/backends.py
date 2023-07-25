@@ -47,7 +47,7 @@ class AzureActiveDirectoryBackend(object):
 
         payload = get_token_payload(token=token, nonce=nonce)
         tid = get_token_payload_field(payload, "tid")
-        if tid != CUSTOMER_TENANT_ID:
+        if tid != self.CUSTOMER_TENANT_ID:
             logger.error(f"Another tenant id:{tid} tried to login")
             return
         email = get_token_payload_email(payload)
