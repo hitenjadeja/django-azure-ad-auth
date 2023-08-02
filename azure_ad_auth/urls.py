@@ -1,9 +1,9 @@
 from .views import auth, complete, logout
-from django.conf.urls import url
+from django.urls import re_path
 
 
 urlpatterns = [
-    url(r'^login/$', auth, name='azure_login'),
-    url(r'^logout/$', logout, name='azure_logout'),
-    url(r'^complete/$', complete, name='azure_complete'),
+    re_path(r'^login/$', auth, name='azure_login'),
+    re_path(r'^logout/$', logout, name='azure_logout'),
+    re_path(r'^complete/$', complete, name='azure_complete'),
 ]
