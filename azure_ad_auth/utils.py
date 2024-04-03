@@ -90,7 +90,7 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
     headers = jwt.get_unverified_header(token)
     logger.debug(f"Headers: {headers}")
     algorithm = headers.get('alg', 'RS256')
-    logger.debug(f"{alogrithm}")
+    logger.debug(f"{algorithm}")
     for key in get_public_keys():
         try:
             payload = jwt.decode(token, key=key, audience=audience, algorithms=[algorithm])
