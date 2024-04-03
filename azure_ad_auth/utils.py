@@ -93,6 +93,7 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
     logger.debug(f"{algorithm}")
     for key in get_public_keys():
         try:
+            logger.debug(f"Token: {type(token)}")
             payload = jwt.decode(token, key=key, audience=audience, algorithms=[algorithm])
             logger.debug(f"Payload: {payload}")
             logger.debug(f"Nonce: {nonce}")
@@ -101,9 +102,12 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
 
             return payload
         except (jwt.InvalidTokenError, IndexError) as e:
+            logger.debug("Invalid")
             pass
         else:
             logger.error(f'InvalidTokenError or IndexError, Could not decode!!!')
+    else:
+        logger.debug(f"There were no public keys found")
 
     return None
 
