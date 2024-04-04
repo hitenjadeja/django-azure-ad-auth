@@ -90,10 +90,12 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
     headers = jwt.get_unverified_header(token)
     logger.debug(f"Headers: {headers}")
     algorithm = headers.get('alg', 'RS256')
-    logger.debug(f"{algorithm}")
+    logger.debug(f"Alg: {algorithm}")
+    logger.debug(f"Aud: {audience}")
+    logger.debug(f"Token: {token}")
     for key in get_public_keys():
         try:
-            logger.debug(f"Token: {type(token)}")
+            logger.debug(f"Key: {key}")
             payload = jwt.decode(token, key=key, audience=audience, algorithms=[algorithm])
             logger.debug(f"Payload: {payload}")
             logger.debug(f"Nonce: {nonce}")
@@ -103,6 +105,7 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
             return payload
         except (jwt.InvalidTokenError, IndexError) as e:
             logger.debug("Invalid")
+            logger.debug(str(e))
             pass
         else:
             logger.error(f'InvalidTokenError or IndexError, Could not decode!!!')
