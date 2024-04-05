@@ -50,8 +50,10 @@ class AzureActiveDirectoryBackend(object):
         if tid != self.CUSTOMER_TENANT_ID:
             if not tid:
                 logger.error(f"tid was empty: {tid} payload: {payload}")
-                logger.error(f"payload keys: {payload.keys()}")
-            logger.error(f"Another tenant id:{tid} tried to login. {payload}")
+                if payload:
+                    logger.error(f"payload keys: {payload.keys()}")
+            else:
+                logger.error(f"Another tenant id:{tid} tried to login. {payload}")
             return
         email = get_token_payload_email(payload)
 
