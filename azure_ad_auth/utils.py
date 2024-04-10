@@ -96,7 +96,6 @@ def get_token_payload(token=None, audience=CLIENT_ID, nonce=None):
 
             return payload
         except (jwt.InvalidTokenError, IndexError) as e:
-            logger.debug(str(e))
             pass
         else:
             logger.error(f'InvalidTokenError or IndexError, Could not decode!!!')
