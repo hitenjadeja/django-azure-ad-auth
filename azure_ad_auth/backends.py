@@ -47,7 +47,12 @@ class AzureActiveDirectoryBackend(object):
 
         payload = get_token_payload(token=token, nonce=nonce)
         tid = get_token_payload_field(payload, "tid")
-        if tid != self.CUSTOMER_TENANT_ID:
+        customer_tenant_id = self.CUSTOMER_TENANT_ID
+        if "," in customer_tenant_id:
+            customer_tenant_id = customer_tenant_id.split(",")
+        else:
+            customer_tenant_id = [customer_tenant_id]
+        if customer_tenant_id and tid and tid not in customer_tenant_id:
             if not tid:
                 logger.error(f"tid was empty: {tid} payload: {payload}")
                 if payload:
