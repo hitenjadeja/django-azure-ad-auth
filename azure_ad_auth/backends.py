@@ -58,7 +58,9 @@ class AzureActiveDirectoryBackend(object):
                 if payload:
                     logger.error(f"payload keys: {payload.keys()}")
             else:
-                logger.error(f"Another tenant id:{tid} tried to login. {payload}")
+                logger.error(f"Another tenant id:{tid} tried to login.")
+                logger.error(f"payload:{payload}")
+                logger.error(f"customer_tenant_id:{customer_tenant_id}")
             return
         email = get_token_payload_email(payload)
 
