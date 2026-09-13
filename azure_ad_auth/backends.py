@@ -4,6 +4,8 @@ from base64 import urlsafe_b64encode
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError, transaction
+from django.db.models import Q
 try:
     from django.contrib.auth import get_user_model
 except ImportError:
@@ -71,7 +73,13 @@ class AzureActiveDirectoryBackend(object):
 
         new_user = {'email': email}
 
-        users = self.User.objects.filter(email__iexact=email)
+        # Reason: the username is a hash of the UPN, the stable identity Azure AD
+        # gives us, while the stored email can be edited afterwards. Matching on
+        # email alone then misses the existing row and the insert collides on
+        # the username (SDSRISKASSIST-27N).
+        users = list(self.User.objects.filter(
+            Q(username=self.username_generator(email)) | Q(email__iexact=email)
+        ))
         if len(users) == 0 and self.USER_CREATION:
             user = self.create_user(new_user, payload)
 
@@ -123,7 +131,18 @@ class AzureActiveDirectoryBackend(object):
         for user_field, val in self.USER_STATIC_MAPPING.items():
             user_kwargs[user_field] = val
 
-        return self.User.objects.create_user(**user_kwargs)
+        try:
+            with transaction.atomic():
+                return self.User.objects.create_user(**user_kwargs)
+        except IntegrityError:
+            # Reason: two callbacks for the same new user can both pass the
+            # lookup; the loser reuses the row the winner inserted. The
+            # savepoint keeps the request transaction usable under
+            # ATOMIC_REQUESTS (SDSRISKASSIST-27P).
+            user = self.User.objects.filter(**{username_field: user_kwargs.get(username_field)}).first()
+            if user is None:
+                raise
+            return user
 
     @staticmethod
     def username_generator(email):
